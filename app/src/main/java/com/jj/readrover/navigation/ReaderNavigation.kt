@@ -11,7 +11,7 @@ import com.jj.readrover.screens.home.Home
 fun ReaderNavigation() {
     val navController = rememberNavController() // 화면 간의 탐색을 관리
     NavHost(navController = navController,
-    startDestination = ReaderScreens.SearchScreen.name){
+    startDestination = ReaderScreens.SplashScreen.name){
         composable(ReaderScreens.SplashScreen.name){
             ReaderSplashScreen(navController = navController) // 스플래시 화면 실행
         }
