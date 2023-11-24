@@ -16,7 +16,7 @@ fun ReaderNavigation() {
             ReaderSplashScreen(navController = navController) // 스플래시 화면 실행
         }
 
-        composable(ReaderScreens.SplashScreen.name){
+        composable(ReaderScreens.ReaderHomeScreen.name){
             Home(navController = navController)
         }
     }
