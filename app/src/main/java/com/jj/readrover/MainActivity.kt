@@ -38,15 +38,14 @@ class MainActivity : ComponentActivity() {
 fun ReaderApp() {
     Surface(color = MaterialTheme.colors.background,
         modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 46.dp)) {
+            .fillMaxSize(), content = {
 
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
             ReaderNavigation() // ReaderNavigation Composable 함수를 호출하여 UI를 구성
         }
 
-    }
+    })
 
 }
 
