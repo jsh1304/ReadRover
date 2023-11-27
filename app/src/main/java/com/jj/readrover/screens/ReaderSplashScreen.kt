@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jj.readrover.navigation.ReaderScreens
 import kotlinx.coroutines.delay
 
 @Preview
@@ -41,6 +42,8 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
                                             }))
         // 애니메이션 끝난 후 2초동안 대기
         delay(2000L)
+
+        navController.navigate(ReaderScreens.LoginScreen.name) // 로그인 화면으로 이동
     }
 
 
