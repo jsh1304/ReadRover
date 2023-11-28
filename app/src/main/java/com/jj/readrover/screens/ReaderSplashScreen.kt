@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jj.readrover.components.ReaderLogo
 import com.jj.readrover.navigation.ReaderScreens
 import kotlinx.coroutines.delay
 
@@ -63,8 +64,7 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
         ) {
 
             // "ReadRover"라는 텍스트를 추가하고, 스타일을 적용
-            Text(text = "ReadRover", style = MaterialTheme.typography.h3,
-                color = Color.Red.copy(alpha = 0.5f))
+            ReaderLogo() // 앱 로고 불러오기
             Spacer(modifier = Modifier.height(15.dp)) // 공간을 추가
             // 슬로건 텍스트를 추가하고, 스타일을 적용
             Text(text = "\"읽는 것이 여행입니다\"",
@@ -74,3 +74,4 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
 
     }
 }
+
