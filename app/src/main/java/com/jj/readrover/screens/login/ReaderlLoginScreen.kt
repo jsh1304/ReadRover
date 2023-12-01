@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -75,7 +76,8 @@ fun UserForm(
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         EmailInput(emailState = email, enabled = !loading, onAction = KeyboardActions {
             passwordFocusRequest.requestFocus()
-        }) // 이메일 입력 필드를 추가하고, 다음 액션으로 비밀번호 필드에 포커스를 요청
+        }, // 이메일 입력 필드를 추가하고, 다음 액션으로 비밀번호 필드에 포커스를 요청
+            )
 
         PasswordInput( // PasswordInput 컴포넌트를 생성
             modifier = Modifier.focusRequester(passwordFocusRequest), // 이는 사용자가 이 입력 필드를 선택할 때 포커스를 받도록 함
@@ -86,9 +88,35 @@ fun UserForm(
             onAction = KeyboardActions { // onAction은 키보드 액션이 발생했을 때 실행되는 콜백 함수
                 if (!valid) return@KeyboardActions
                 onDone(email.value.trim(), password.value.trim()) // valid가 true일 때만 onDone 함수를 호출하도록 설정
-            }
+            })
+        SubmitButton( // 사용자가 로그인 또는 계정을 만들기 위한 버튼
+            textId = if (isCreateAccount) "계정 만들기" else "로그인", // textId는 버튼에 표시될 텍스트
+            loading = loading, // loading은 현재 로딩 상태
+            validInputs = valid  // validInputs는 입력값의 유효성. 입력값이 유효하지 않으면 버튼이 비활성화
+        ) {
+            // 버튼을 클릭하면 onDone 함수가 호출되며, 이메일과 비밀번호가 전달
+            onDone(email.value.trim(), password.value.trim())
+        }
+    }
+}
 
-        )
+// SubmitButton 함수는 사용자가 클릭할 수 있는 버튼을 생성
+@Composable
+fun SubmitButton(textId: String, 
+                 loading: Boolean, 
+                 validInputs: Boolean,
+                onClick: () -> Unit) {
+    Button(onClick = onClick,
+        modifier = Modifier
+            .padding(3.dp)
+            .fillMaxWidth(),
+        enabled = !loading && validInputs,  // 버튼은 로딩 중이 아니고 입력값이 유효할 때만 활성화
+        shape = CircleShape
+    ) {
+        // 로딩 중이면 CircularProgressIndicator가 표시되고, 그렇지 않으면 버튼 텍스트가 표시
+        if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp))
+        else Text(text = textId, modifier = Modifier.padding(5.dp))
+        
     }
 }
 
