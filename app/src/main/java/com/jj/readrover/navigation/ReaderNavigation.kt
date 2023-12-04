@@ -1,6 +1,7 @@
 package com.jj.readrover.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -8,6 +9,7 @@ import com.jj.readrover.screens.ReaderSplashScreen
 import com.jj.readrover.screens.home.Home
 import com.jj.readrover.screens.login.ReaderLoginScreen
 
+@ExperimentalComposeUiApi
 @Composable
 fun ReaderNavigation() {
     val navController = rememberNavController() // 화면 간의 탐색을 관리
