@@ -16,7 +16,8 @@ enum class ReaderScreens {
     companion object {
         /**
          * 주어진 경로로부터 ReaderScreen 생성
-         * 경로가 없가나 인식되지 않는 경우, 기본적으로 '리더 홈 화면'을 반환
+         * 경로가 없다면 (null), 기본적으로 '리더 홈 화면'을 반환
+         * route가 인식되지 않는다면 (else), IllegalArgumentException을 발생 (메서드에 부적절한 인수가 전달됐을 때 발생하는 예외)
          */
         fun fromRoute(route: String?): ReaderScreens
          = when(route?.substringBefore("/")) {
