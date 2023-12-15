@@ -38,11 +38,16 @@ import com.jj.readrover.R
 import com.jj.readrover.components.EmailInput
 import com.jj.readrover.components.PasswordInput
 import com.jj.readrover.components.ReaderLogo
+import com.jj.readrover.navigation.ReaderNavigation
+import com.jj.readrover.navigation.ReaderScreens
 
 // 로그인 화면 구현
 @ExperimentalComposeUiApi
 @Composable
-fun ReaderLoginScreen(navController: NavHostController) {
+fun ReaderLoginScreen(
+    navController: NavHostController,
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+) {
     // 로그인 폼 표시 여부를 저장하는 상태를 생성
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -52,7 +57,10 @@ fun ReaderLoginScreen(navController: NavHostController) {
             ReaderLogo()
             // 로그인 폼 표시 여부에 따라 사용자 폼을 표시
             if (showLoginForm.value) UserForm(loading = false, isCreateAccount = false) {email, password ->
-
+                viewModel.signInWitEmailAndPassword(email, password) {
+                    // 로그인 성공 시 홈화면으로 이동
+                    navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                }
             }
             else {
                 // 회원가입 폼에서 이메일과 비밀번호를 입력받음

@@ -25,16 +25,17 @@ class LoginScreenViewModel: ViewModel() {
     val loading: LiveData<Boolean> = _loading
 
     // 이메일과 비밀번호로 로그인을 시도
-    fun signInWitEmailAndPassword(email: String, password: String)
+    fun signInWitEmailAndPassword(email: String, password: String, home: () -> Unit)
     = viewModelScope.launch{
         try {
             // Firebase 인증을 사용하여 이메일과 비밀번호로 로그인을 시도
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful){ // 작업이 성공적으로 완료하면
-
+                        Log.d("FB", "signInWitEmailAndPassword: success ${task.result.toString()}")
+                        home() // 홈 화면 호출
                     } else { // 작업이 실패하면
-                        Log.d("FB", "signInWitEmailAndPassword: ${task.result.toString()}")
+                        Log.d("FB", "signInWitEmailAndPassword: fail ${task.result.toString()}")
                     }
                 }
         } catch (ex: Exception) { // 예외가 발생하면 예외 메시지를 로그로 출력
