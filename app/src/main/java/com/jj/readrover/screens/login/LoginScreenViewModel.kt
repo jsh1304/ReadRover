@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -56,6 +57,9 @@ class LoginScreenViewModel: ViewModel() {
             auth.createUserWithEmailAndPassword(email, password) // Firebase auth를 사용 -> 이메일, 비번으로 사용자 생성
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) { // 작업이 성공하면
+                        // 아이디@이메일.com의 아이디 부분
+                        val displayName = task.result?.user?.email?.split('@')?.get(0)
+                        createUser(displayName) // 유저 정보 생성
                         home() // home 함수 실행
                     } else { // 작업이 실패하면 로그에 메시지 출력
                         Log.d("FB", "createUserWithEmailAndPassword: ${task.result}")
@@ -63,6 +67,18 @@ class LoginScreenViewModel: ViewModel() {
                     _loading.value = false // 작업이 완료 -> 로딩 상태를 false로 변경
                 }
         }
+    }
+
+    // Firestore에 유저 정보 추가 메서드
+    private fun createUser(displayName: String?) {
+        val userId = auth.currentUser?.uid // 현재 사용자의 인증 uid
+        val user = mutableMapOf<String, Any>() // 유저 정보 map
+        user["user_id"] = userId.toString() // 유저의 uid
+        user["display_name"] = displayName.toString() // 유저 표시 이름 = 아이디
+
+        // "users" 컬렉션에 user 정보 추가
+        FirebaseFirestore.getInstance().collection("users")
+            .add(user)
     }
 
 }
