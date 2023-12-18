@@ -43,4 +43,26 @@ class LoginScreenViewModel: ViewModel() {
         }
     }
 
+
+    // 회원가입 메서드
+    fun createUserWithEmailAndPassword(
+        email: String,
+        password: String,
+        home: () -> Unit) {
+
+        // 로딩 중 x -> 회원가입 시도
+        if (_loading.value == false) {
+            _loading.value = true // 로딩 상태를 true로 변경
+            auth.createUserWithEmailAndPassword(email, password) // Firebase auth를 사용 -> 이메일, 비번으로 사용자 생성
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) { // 작업이 성공하면
+                        home() // home 함수 실행
+                    } else { // 작업이 실패하면 로그에 메시지 출력
+                        Log.d("FB", "createUserWithEmailAndPassword: ${task.result}")
+                    }
+                    _loading.value = false // 작업이 완료 -> 로딩 상태를 false로 변경
+                }
+        }
+    }
+
 }

@@ -56,16 +56,22 @@ fun ReaderLoginScreen(
             // 로고를 표시하는 컴포넌트를 호출
             ReaderLogo()
             // 로그인 폼 표시 여부에 따라 사용자 폼을 표시
+            // 로딩상태는 false, 계정 생성 옵션은 false
             if (showLoginForm.value) UserForm(loading = false, isCreateAccount = false) {email, password ->
                 viewModel.signInWitEmailAndPassword(email, password) {
                     // 로그인 성공 시 홈화면으로 이동
                     navController.navigate(ReaderScreens.ReaderHomeScreen.name)
                 }
             }
-            else {
+            else { // 로그인 폼이 보여지지 않는 경우, 회원가입 폼을 보여줌
                 // 회원가입 폼에서 이메일과 비밀번호를 입력받음
+                // 로딩상태는 false, 계정 생성 옵션은 true
                 UserForm(loading = false, isCreateAccount = true) {email, password ->
-
+                    // 사용자가 이메일과 비밀번호를 입력하면, 이를 사용하여 계정을 생성
+                    viewModel.createUserWithEmailAndPassword(email, password) {
+                        // 계정 생성이 성공 -> 홈 화면으로 이동
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                    }
                 }
             }
         }
