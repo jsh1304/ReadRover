@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.jj.readrover.model.MUser
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -72,9 +73,13 @@ class LoginScreenViewModel: ViewModel() {
     // Firestore에 유저 정보 추가 메서드
     private fun createUser(displayName: String?) {
         val userId = auth.currentUser?.uid // 현재 사용자의 인증 uid
-        val user = mutableMapOf<String, Any>() // 유저 정보 map
-        user["user_id"] = userId.toString() // 유저의 uid
-        user["display_name"] = displayName.toString() // 유저 표시 이름 = 아이디
+        val user = MUser(userId = userId.toString(),
+            displayName = displayName.toString(),
+            avatarUrl = "",
+            quote = "Life is good",
+            profession = "안드로이드 개발자",
+            id = null).toMap() // MUser 객체 속성들을 Map 형태로 변환한 값
+
 
         // "users" 컬렉션에 user 정보 추가
         FirebaseFirestore.getInstance().collection("users")

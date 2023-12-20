@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jj.readrover.components.ReaderLogo
 import com.jj.readrover.navigation.ReaderScreens
 import kotlinx.coroutines.delay
@@ -43,6 +44,14 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
                                             }))
         // 애니메이션 끝난 후 2초동안 대기
         delay(2000L)
+
+        // 로그인을 이미 했었다면 바로 홈화면으로 이동
+/*        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
+            navController.navigate(ReaderScreens.LoginScreen.name)
+        } else {
+            navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+        }*/
+
 
         navController.navigate(ReaderScreens.LoginScreen.name) // 로그인 화면으로 이동
     }
