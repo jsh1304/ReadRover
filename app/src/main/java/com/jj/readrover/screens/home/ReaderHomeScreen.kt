@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.jj.readrover.navigation.ReaderScreens
 
 @Composable
 fun Home(navController: NavHostController) {
@@ -71,7 +75,18 @@ fun ReaderAppBar(
             }
         },
         // actions: 앱 바의 액션을 설정
-        actions = {},
+        actions = {
+                  IconButton(onClick = { // 아이콘 클릭 시 사용자 로그아웃
+                      FirebaseAuth.getInstance().signOut().run {
+                          // 로그아웃 후에 로그인 화면으로 이동
+                          navController.navigate(ReaderScreens.LoginScreen.name)
+                      }
+                  }) {
+                      // 로그아웃 아이콘
+                    Icon(imageVector = Icons.Filled.Logout,
+                        contentDescription = "Logout")
+                  }
+        },
         // backgroundColor: 앱 바의 배경색을 설정
         backgroundColor = Color.Transparent,
         // elevation: 앱 바의 그림자 높이를 설정
