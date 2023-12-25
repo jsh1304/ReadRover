@@ -1,8 +1,7 @@
 package com.jj.readrover.screens.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,17 +14,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
+import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
+@Preview
 @Composable
-fun Home(navController: NavHostController) {
+fun Home(navController: NavController = NavController(LocalContext.current)) {
     // Scaffold: 앱의 기본 레이아웃을 구성
     Scaffold(
         // TopBar: 앱의 상단 바를 설정
@@ -42,7 +48,18 @@ fun Home(navController: NavHostController) {
 
         // 앱의 내용을 포함하는 표면을 설정
         Surface(modifier = Modifier.fillMaxSize()) {
+            HomeContent(navController)
+        }
+    }
+}
 
+// 홈 콘텐츠를 보여주는 UI 컴포넌트
+@Composable
+fun HomeContent(navController: NavController) {
+    Column(Modifier.padding(2.dp),
+        verticalArrangement = Arrangement.SpaceEvenly) {
+        Row(modifier = Modifier.align(alignment = Alignment.Start)) {
+            TitleSection(label = "독서현황")
         }
     }
 }
@@ -52,7 +69,7 @@ fun Home(navController: NavHostController) {
 fun ReaderAppBar(
     title: String,
     showProfile: Boolean = true,
-    navController: NavHostController
+    navController: NavController
 ) {
 
     // TopAppBar: 앱 바의 레이아웃과 스타일을 설정
@@ -84,13 +101,33 @@ fun ReaderAppBar(
                   }) {
                       // 로그아웃 아이콘
                     Icon(imageVector = Icons.Filled.Logout,
-                        contentDescription = "Logout")
+                        contentDescription = "Logout",
+                        tint = Color.Green.copy(alpha = 0.4f))
                   }
         },
         // backgroundColor: 앱 바의 배경색을 설정
         backgroundColor = Color.Transparent,
         // elevation: 앱 바의 그림자 높이를 설정
         elevation = 0.dp)
+}
+
+// 타이틀을 보여주는 UI 컴포넌트
+@Composable
+fun TitleSection(modifier: Modifier = Modifier,
+                label: String) {
+    Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
+        Column {
+            Text(text = label,
+                fontSize = 19.sp,
+                fontStyle = FontStyle.Normal,
+                textAlign = TextAlign.Left)
+        }
+    }
+}
+
+@Composable
+fun ReadingRightNowArea(books: List<MBook>, navController: NavHostController) {
+
 }
 
 // 플로팅 액션 버튼의 내용을 구성
