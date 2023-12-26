@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jj.readrover.screens.ReaderSplashScreen
 import com.jj.readrover.screens.home.Home
 import com.jj.readrover.screens.login.ReaderLoginScreen
+import com.jj.readrover.screens.stats.ReaderStatsScreen
 
 @ExperimentalComposeUiApi
 @Composable
@@ -21,6 +22,10 @@ fun ReaderNavigation() {
 
         composable(ReaderScreens.LoginScreen.name){ // 로그인 화면 실행
             ReaderLoginScreen(navController = navController)
+        }
+
+        composable(ReaderScreens.ReaderStatsScreen.name){ // 사용자 독서 통계 화면 실행
+            ReaderStatsScreen(navController = navController)
         }
 
         composable(ReaderScreens.ReaderHomeScreen.name){ // 홈 화면 실행
