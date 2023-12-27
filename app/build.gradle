@@ -81,7 +81,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
 
-
+    // Coil : Kotlin Coroutines를 기반으로 한 Android용 이미지 로딩 라이브러리
+    implementation("io.coil-kt:coil-compose:1.4.0")
 
 
     implementation 'androidx.core:core-ktx:1.7.0'
