@@ -13,8 +13,10 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,7 +66,7 @@ fun HomeContent(navController: NavController) {
             ?.get(0) else
                 "N/A" // 이메일 주소가 null이거나 비었다면 "N/A"로 설정
     Column(Modifier.padding(2.dp),
-        verticalArrangement = Arrangement.SpaceEvenly) {
+        verticalArrangement = Arrangement.Top) {
         Row(modifier = Modifier.align(alignment = Alignment.Start)) {
             TitleSection(label = "독서현황")
             Spacer(modifier = Modifier.fillMaxWidth(0.7f))  // 화면의 가로길이의 70%에 해당하는 공간 만들기
@@ -87,6 +89,7 @@ fun HomeContent(navController: NavController) {
                 Divider()
             }
         }
+        ListCard() // 책 리스트 카드 불러오기
     }
 }
 
@@ -94,6 +97,27 @@ fun HomeContent(navController: NavController) {
 @Composable
 fun ReadingRightNowArea(books: List<MBook>, navController: NavHostController) {
 
+}
+
+@Composable
+fun RoundedButton(
+    label: String = "독서하기", // 버튼에 표시될 텍스트
+    radius: Int = 29, // 모서리 둥근 정도를 결정하는 반지름
+    onPress: () -> Unit = {}) { // 버튼 클릭 시 실맹될 함수
+    Surface(modifier = Modifier.clip(RoundedCornerShape( // clip을 사용하여 모서리가 둥근 모양을 적용
+        bottomEndPercent = radius, // 하단 오른쪽 모서리의 둥근 정도를 설정
+        topStartPercent = radius)), // 상단 원쪽 모서리의 둥근 정도를 설정
+            color = Color(0xFF92CBDF)) {
+
+        Column(modifier = Modifier
+            .width(90.dp)
+            .heightIn(40.dp) // Column의 최소 높이를 설정
+            .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
+        }
+    }
 }
 
 
@@ -147,7 +171,7 @@ fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
                     Icon(imageVector = Icons.Rounded.FavoriteBorder,
                         contentDescription = "Fav Icon",
                         modifier = Modifier.padding(bottom = 1.dp))
-                    
+
                     BookRating(score = 4.0) // 책 평가 점수 표시 함수 호출
                 }
 
@@ -163,6 +187,10 @@ fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
                 style = MaterialTheme.typography.caption)
         }
 
+        Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom) {
+            RoundedButton(label = "독서하기", radius = 70) // 독서 하기 버튼 구현
+        }
     }
 
 }
