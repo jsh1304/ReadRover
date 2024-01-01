@@ -156,7 +156,7 @@ fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
             horizontalAlignment = Alignment.Start) {
             Row(horizontalArrangement = Arrangement.Center) {
                 // 책 이미지 생성
-                Image(painter = rememberImagePainter(data = ""),
+                Image(painter = rememberImagePainter(data = "https://image.yes24.com/goods/55148593/XL"),
                     contentDescription = "book image",
                     modifier = Modifier
                         .height(140.dp)
