@@ -2,7 +2,9 @@ package com.jj.readrover.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -27,6 +29,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.jj.readrover.components.FABContent
+import com.jj.readrover.components.ListCard
 import com.jj.readrover.components.ReaderAppBar
 import com.jj.readrover.components.TitleSection
 import com.jj.readrover.model.MBook
@@ -60,6 +63,14 @@ fun Home(navController: NavController = NavController(LocalContext.current)) {
 @Composable
 fun HomeContent(navController: NavController) {
 
+    val listOfBooks = listOf(
+        MBook(id = "aaa", title = "헬로 월드", authors = "누군가", notes = null),
+        MBook(id = "bbb", title = "굿바이 월드", authors = "누군가", notes = null),
+        MBook(id = "ccc", title = "투모로우 월드", authors = "누군가", notes = null),
+        MBook(id = "ddd", title = "하이 월드", authors = "누군가", notes = null),
+        MBook(id = "eee", title = "리얼 월드", authors = "누군가", notes = null),
+    )
+
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserName = if (!email.isNullOrEmpty()) // 이메일 주소가 null이 아니고 비어있지 않다면
         FirebaseAuth.getInstance().currentUser?.email?.split("@") // 이메일의 사용자 아이디 생성
@@ -89,131 +100,55 @@ fun HomeContent(navController: NavController) {
                 Divider()
             }
         }
-        ListCard() // 책 리스트 카드 불러오기
+
+        // 현재 읽는 책 보여주는 영역
+        ReadingRightNowArea(books = listOf(),
+            navController = navController)
+
+        // "독서 리스트" 제목 섹션
+        TitleSection(label = "독서 리스트")
+
+        // 책 리스트 영역
+        BookListArea(listOfBooks = listOfBooks, navController = navController)
     }
 }
 
-
+// 책 리스트 영역
 @Composable
-fun ReadingRightNowArea(books: List<MBook>, navController: NavHostController) {
-
-}
-
-@Composable
-fun RoundedButton(
-    label: String = "독서하기", // 버튼에 표시될 텍스트
-    radius: Int = 29, // 모서리 둥근 정도를 결정하는 반지름
-    onPress: () -> Unit = {}) { // 버튼 클릭 시 실맹될 함수
-    Surface(modifier = Modifier.clip(RoundedCornerShape( // clip을 사용하여 모서리가 둥근 모양을 적용
-        bottomEndPercent = radius, // 하단 오른쪽 모서리의 둥근 정도를 설정
-        topStartPercent = radius)), // 상단 원쪽 모서리의 둥근 정도를 설정
-            color = Color(0xFF92CBDF)) {
-
-        Column(modifier = Modifier
-            .width(90.dp)
-            .heightIn(40.dp) // Column의 최소 높이를 설정
-            .clickable { onPress.invoke() },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
-        }
+fun BookListArea(listOfBooks: List<MBook>,
+                 navController: NavController) {
+    HorizontalScrollableComponent(listOfBooks) {
+        // TODO: 카드 클릭 시 책 세부사항으로 이동
     }
 }
 
-
-// 책 리스트 카드 생성 함수
-@Preview
+// 수평 스크롤 가능 컴포넌트
 @Composable
-fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
-            onPressDetails: (String) -> Unit = {}) { // onPressDetails는 카드가 클릭되었을 때 호출되는 함수
-    val context = LocalContext.current
+fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (String) -> Unit) {
+    val scrollState = rememberScrollState() // 스크롤 가능한 컴포넌트, 스크롤 위치를 기억
 
-    // resources: 디바이스의 환경설정, 화면 크기, 밀도 등에 따라 동적으로 변화할 수 있는 값들을 제공
-    val resources = context.resources
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(280.dp)
+        .horizontalScroll(scrollState)) {
 
-    // displayMetrics: 디바이스 화면의 여러 가지 메트릭(치수) 정보를 담고 있음.
-    // 화면의 너비, 높이, 밀도, 폰트 크기 등을 포함
-    val displayMetrics = resources.displayMetrics
-
-    /*
-    * 디바이스 화면의 너비를 밀도 독립적인 픽셀(dp) 단위로 변환하는 공식
-    * 이렇게 하면 다양한 화면 크기와 해상도를 가진 디바이스에서도 일관된 레이아웃과 디자인을 유지할 수 있음
-    * */
-    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
-
-    val spacing = 10.dp
-
-    // 책 카드 생성
-    Card(shape = RoundedCornerShape(30.dp),
-        backgroundColor = Color.LightGray,
-        elevation = 50.dp,
-        modifier = Modifier
-            .padding(15.dp)
-            .height(240.dp)
-            .width(200.dp)
-            .clickable { onPressDetails.invoke(book.title.toString()) }) { // 클릭 시 책 상세 정보를 제공
-        Column(modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
-            horizontalAlignment = Alignment.Start) {
-            Row(horizontalArrangement = Arrangement.Center) {
-                // 책 이미지 생성
-                Image(painter = rememberImagePainter(data = "https://image.yes24.com/goods/55148593/XL"),
-                    contentDescription = "book image",
-                    modifier = Modifier
-                        .height(140.dp)
-                        .width(100.dp)
-                        .padding(4.dp))
-                Spacer(modifier = Modifier.width(50.dp)) // 가로 방향으로 50dp 공간 만들기
-
-                Column(modifier = Modifier.padding(top = 25.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    // '좋아요' 아이콘
-                    Icon(imageVector = Icons.Rounded.FavoriteBorder,
-                        contentDescription = "Fav Icon",
-                        modifier = Modifier.padding(bottom = 1.dp))
-
-                    BookRating(score = 4.0) // 책 평가 점수 표시 함수 호출
-                }
-
+        for (book in listOfBooks) {
+            ListCard(book) {
+                onCardPressed(it)
             }
-            // 책 제목 텍스트
-            Text(text = "책 제목", modifier = Modifier.padding(4.dp),
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis) // Ellipsis: 텍스트가 길어질 시 ..으로 생략
-
-            // 책 글쓴이 텍스트
-            Text(text = "글쓴이: 가나다", modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.caption)
-        }
-
-        Row(horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom) {
-            RoundedButton(label = "독서하기", radius = 70) // 독서 하기 버튼 구현
         }
     }
-
 }
 
-// 책 평가 점수 표시 함수
+// 현재 읽는 책 보여주는 영역
 @Composable
-fun BookRating(score: Double = 4.5) {
-    Surface(modifier = Modifier
-        .height(70.dp)
-        .padding(4.dp),
-            shape = RoundedCornerShape(55.dp),
-            elevation = 6.dp,
-            color = Color.White) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            // 별 표시 아이콘
-            Icon(imageVector = Icons.Filled.StarBorder,
-                contentDescription = "Star")
+fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
 
-            // 책 평가 점수 아이콘
-            Text(text = score.toString(), style = MaterialTheme.typography.subtitle1)
-        }
-    }
+    ListCard() // 책 리스트 카드 불러오기
 }
+
+
+
 
 
 

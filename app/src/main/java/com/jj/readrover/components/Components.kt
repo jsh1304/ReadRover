@@ -1,18 +1,15 @@
 package com.jj.readrover.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -20,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,10 +26,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
 // 앱 로고 구현
@@ -137,6 +139,103 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
     }
 }
 
+
+// 책 리스트 카드 생성 함수
+@Preview
+@Composable
+fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
+             onPressDetails: (String) -> Unit = {}) { // onPressDetails는 카드가 클릭되었을 때 호출되는 함수
+    val context = LocalContext.current
+
+    // resources: 디바이스의 환경설정, 화면 크기, 밀도 등에 따라 동적으로 변화할 수 있는 값들을 제공
+    val resources = context.resources
+
+    // displayMetrics: 디바이스 화면의 여러 가지 메트릭(치수) 정보를 담고 있음.
+    // 화면의 너비, 높이, 밀도, 폰트 크기 등을 포함
+    val displayMetrics = resources.displayMetrics
+
+    /*
+    * 디바이스 화면의 너비를 밀도 독립적인 픽셀(dp) 단위로 변환하는 공식
+    * 이렇게 하면 다양한 화면 크기와 해상도를 가진 디바이스에서도 일관된 레이아웃과 디자인을 유지할 수 있음
+    * */
+    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
+
+    val spacing = 10.dp
+
+    // 책 카드 생성
+    Card(shape = RoundedCornerShape(30.dp),
+        backgroundColor = Color.LightGray,
+        elevation = 50.dp,
+        modifier = Modifier
+            .padding(15.dp)
+            .height(240.dp)
+            .width(200.dp)
+            .clickable { onPressDetails.invoke(book.title.toString()) }) { // 클릭 시 책 상세 정보를 제공
+        Column(modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
+            horizontalAlignment = Alignment.Start) {
+            Row(horizontalArrangement = Arrangement.Center) {
+                // 책 이미지 생성
+                Image(painter = rememberImagePainter(data = "https://image.yes24.com/goods/55148593/XL"),
+                    contentDescription = "book image",
+                    modifier = Modifier
+                        .height(140.dp)
+                        .width(100.dp)
+                        .padding(4.dp))
+                Spacer(modifier = Modifier.width(50.dp)) // 가로 방향으로 50dp 공간 만들기
+
+                Column(modifier = Modifier.padding(top = 25.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    // '좋아요' 아이콘
+                    Icon(imageVector = Icons.Rounded.FavoriteBorder,
+                        contentDescription = "Fav Icon",
+                        modifier = Modifier.padding(bottom = 1.dp))
+
+                    BookRating(score = 4.0) // 책 평가 점수 표시 함수 호출
+                }
+
+            }
+            // 책 제목 텍스트
+            Text(text = book.title.toString(), modifier = Modifier.padding(4.dp),
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis) // Ellipsis: 텍스트가 길어질 시 ..으로 생략
+
+            // 책 글쓴이 텍스트
+            Text(text = book.authors.toString(), modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.caption)
+        }
+
+        Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom) {
+            RoundedButton(label = "독서하기", radius = 70) // 독서 하기 버튼 구현
+        }
+    }
+
+}
+
+
+@Composable
+fun RoundedButton(
+    label: String = "독서하기", // 버튼에 표시될 텍스트
+    radius: Int = 29, // 모서리 둥근 정도를 결정하는 반지름
+    onPress: () -> Unit = {}) { // 버튼 클릭 시 실맹될 함수
+    Surface(modifier = Modifier.clip(RoundedCornerShape( // clip을 사용하여 모서리가 둥근 모양을 적용
+        bottomEndPercent = radius, // 하단 오른쪽 모서리의 둥근 정도를 설정
+        topStartPercent = radius)), // 상단 원쪽 모서리의 둥근 정도를 설정
+        color = Color(0xFF92CBDF)) {
+
+        Column(modifier = Modifier
+            .width(90.dp)
+            .heightIn(40.dp) // Column의 최소 높이를 설정
+            .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
+        }
+    }
+}
+
 //앱 바를 구성
 @Composable
 fun ReaderAppBar(
@@ -209,5 +308,26 @@ fun FABContent(onTap: (String) -> Unit) {
         Icon(imageVector = Icons.Default.Add,
             contentDescription = "책 추가",
             tint = MaterialTheme.colors.onSecondary)
+    }
+}
+
+
+// 책 평가 점수 표시 함수
+@Composable
+fun BookRating(score: Double = 4.5) {
+    Surface(modifier = Modifier
+        .height(70.dp)
+        .padding(4.dp),
+        shape = RoundedCornerShape(55.dp),
+        elevation = 6.dp,
+        color = Color.White) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            // 별 표시 아이콘
+            Icon(imageVector = Icons.Filled.StarBorder,
+                contentDescription = "Star")
+
+            // 책 평가 점수 아이콘
+            Text(text = score.toString(), style = MaterialTheme.typography.subtitle1)
+        }
     }
 }
