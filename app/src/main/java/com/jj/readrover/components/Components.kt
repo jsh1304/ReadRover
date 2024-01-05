@@ -1,5 +1,6 @@
 package com.jj.readrover.components
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -240,8 +242,10 @@ fun RoundedButton(
 @Composable
 fun ReaderAppBar(
     title: String,
+    icon: ImageVector? = null,
     showProfile: Boolean = true,
-    navController: NavController
+    navController: NavController,
+    onBackArrowClicked:() -> Unit = {}
 ) {
 
     // TopAppBar: 앱 바의 레이아웃과 스타일을 설정
@@ -257,6 +261,13 @@ fun ReaderAppBar(
                             .clip(RoundedCornerShape(12.dp))
                             .scale(0.9f))
                 }
+                if (icon != null) { // 아이콘이 존재한다면
+                    // 아이콘 클릭 시 onBackArrowCliecked 실행
+                    Icon(imageVector = icon, contentDescription = "arrow back",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.clickable { onBackArrowClicked.invoke() })
+                }
+                Spacer(modifier = Modifier.width(45.dp))
                 // 앱 바의 제목 텍스트를 설정
                 Text(text = title,
                     color = Color.Red.copy(alpha = 0.7f),
@@ -271,10 +282,13 @@ fun ReaderAppBar(
                     navController.navigate(ReaderScreens.LoginScreen.name)
                 }
             }) {
-                // 로그아웃 아이콘
-                Icon(imageVector = Icons.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = Color.Green.copy(alpha = 0.4f))
+                if (showProfile) Row() {
+                    // 로그아웃 아이콘
+                    Icon(imageVector = Icons.Filled.Logout,
+                        contentDescription = "Logout",
+                        tint = Color.Green.copy(alpha = 0.4f)) // 투명도를 0.4로 설정
+                } else Box {} // Box 레이아웃을 생성
+
             }
         },
         // backgroundColor: 앱 바의 배경색을 설정
