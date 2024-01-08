@@ -48,7 +48,7 @@ fun Home(navController: NavController = NavController(LocalContext.current)) {
         // 플로팅 액션 버튼을 설정
         floatingActionButton = {
             FABContent{
-
+                navController.navigate(ReaderScreens.SearchScreen.name)
             }
         }) {
 

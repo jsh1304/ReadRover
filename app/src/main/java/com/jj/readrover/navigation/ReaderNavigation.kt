@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jj.readrover.screens.ReaderSplashScreen
 import com.jj.readrover.screens.home.Home
 import com.jj.readrover.screens.login.ReaderLoginScreen
+import com.jj.readrover.screens.search.SearchScreen
 import com.jj.readrover.screens.stats.ReaderStatsScreen
 
 @ExperimentalComposeUiApi
@@ -30,6 +31,10 @@ fun ReaderNavigation() {
 
         composable(ReaderScreens.ReaderHomeScreen.name){ // 홈 화면 실행
             Home(navController = navController)
+        }
+
+        composable(ReaderScreens.SearchScreen.name){ // 책 검색 화면 실행
+            SearchScreen(navController = navController)
         }
     }
 }
