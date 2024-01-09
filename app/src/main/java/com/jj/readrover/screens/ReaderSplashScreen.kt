@@ -46,11 +46,11 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
         delay(2000L)
 
         // 로그인을 이미 했었다면 바로 홈화면으로 이동
-/*        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
+        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
             navController.navigate(ReaderScreens.LoginScreen.name)
         } else {
             navController.navigate(ReaderScreens.ReaderHomeScreen.name)
-        }*/
+        }
 
 
         navController.navigate(ReaderScreens.LoginScreen.name) // 로그인 화면으로 이동

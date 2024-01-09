@@ -1,26 +1,33 @@
 package com.jj.readrover.screens.search
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.jj.readrover.components.InputField
 import com.jj.readrover.components.ReaderAppBar
+import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
 @ExperimentalComposeUiApi
@@ -41,14 +48,73 @@ fun SearchScreen(navController: NavController = NavController(LocalContext.curre
         Surface() {
             Column {
                 SearchForm( // 검색 폼 함수
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(16.dp)
-                )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)) {
+                    Log.d("TAG", "SearchScreen: $it")
+                }
+
+                Spacer(modifier = Modifier.height(13.dp))
+                BookList(navController) // 검색에 대한 책 리스트
 
             }
         }
     }
 
+}
+
+// 검색에 대한 책 리스트
+@Composable
+fun BookList(navController: NavController) {
+    val listOfBooks = listOf(
+        MBook(id = "aaa", title = "헬로 월드", authors = "누군가", notes = null),
+        MBook(id = "bbb", title = "굿바이 월드", authors = "누군가", notes = null),
+        MBook(id = "ccc", title = "투모로우 월드", authors = "누군가", notes = null),
+        MBook(id = "ddd", title = "하이 월드", authors = "누군가", notes = null),
+        MBook(id = "eee", title = "리얼 월드", authors = "누군가", notes = null),
+    )
+
+    // LazyColumn을 활용한 책 리스트
+    LazyColumn(modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(16.dp)) { // 컨텐츠 주변에 패딩 16dp
+        // items 함수를 활용 -> 각 책 정보에 대한 행을 생성
+        items(items = listOfBooks) { book ->
+            BookRow(book, navController) // 책 정보 표시
+        }
+    }
+}
+
+// 하나의 책 정보 표시하는 메소드
+@Composable
+fun BookRow(book: MBook,
+            navController: NavController) {
+    Card(modifier = Modifier
+        .clickable { }
+        .fillMaxWidth()
+        .height(100.dp)
+        .padding(3.dp),
+        shape = RectangleShape,
+        elevation = 7.dp) { // 그림자 깊이 7.dp
+        Row(modifier = Modifier.padding(5.dp),
+            verticalAlignment = Alignment.Top) {
+            val imageUrl = "https://image.yes24.com/goods/55148593/XL"
+            Image(painter = rememberImagePainter(data = imageUrl), 
+                contentDescription = "book image",
+                modifier = Modifier.width(80.dp)
+                    .fillMaxHeight().padding(end = 4.dp))
+            // 책 정보를 세로로 나열
+            Column() {
+                // 책 제목 텍스트
+                Text(text = book.title.toString(),
+                    overflow = TextOverflow.Ellipsis) // Elipsis: 텍스트가 넘치면 ...으로 표기하는 방식
+                // 책 작가 텍스트
+                Text(text = "작가: ${book.authors}",
+                    overflow = TextOverflow.Clip, // Clip: 텍스트가 넘치면 잘라내는 방식
+                    style = MaterialTheme.typography.caption)
+            }
+        }
+
+    }
 }
 
 // 책 검색 폼 함수
