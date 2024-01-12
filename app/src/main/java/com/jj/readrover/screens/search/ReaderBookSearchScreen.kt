@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.jj.readrover.components.InputField
@@ -31,11 +32,13 @@ import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
 @ExperimentalComposeUiApi
-@Preview
 @Composable
 // LocalContext.current인 현재 컨텍스트를 기반으로 NavCotroller를 생성
 // 이렇게 하면 @Preview에서도 NavController 사용 가능
-fun SearchScreen(navController: NavController = NavController(LocalContext.current)) {
+fun SearchScreen(
+    navController: NavController,
+    viewModel: BookSearchViewModel = hiltViewModel()
+) {
     Scaffold(topBar = {
         ReaderAppBar(title = "책 검색",
             icon = Icons.Default.ArrowBack, // 뒤로가기 아이콘
@@ -50,8 +53,9 @@ fun SearchScreen(navController: NavController = NavController(LocalContext.curre
                 SearchForm( // 검색 폼 함수
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)) {
-                    Log.d("TAG", "SearchScreen: $it")
+                        .padding(16.dp),
+                    viewModel) { query ->
+                    viewModel.searchBooks(query)
                 }
 
                 Spacer(modifier = Modifier.height(13.dp))
@@ -66,6 +70,7 @@ fun SearchScreen(navController: NavController = NavController(LocalContext.curre
 // 검색에 대한 책 리스트
 @Composable
 fun BookList(navController: NavController) {
+
     val listOfBooks = listOf(
         MBook(id = "aaa", title = "헬로 월드", authors = "누군가", notes = null),
         MBook(id = "bbb", title = "굿바이 월드", authors = "누군가", notes = null),
@@ -100,8 +105,10 @@ fun BookRow(book: MBook,
             val imageUrl = "https://image.yes24.com/goods/55148593/XL"
             Image(painter = rememberImagePainter(data = imageUrl), 
                 contentDescription = "book image",
-                modifier = Modifier.width(80.dp)
-                    .fillMaxHeight().padding(end = 4.dp))
+                modifier = Modifier
+                    .width(80.dp)
+                    .fillMaxHeight()
+                    .padding(end = 4.dp))
             // 책 정보를 세로로 나열
             Column() {
                 // 책 제목 텍스트
@@ -122,6 +129,7 @@ fun BookRow(book: MBook,
 @Composable
 fun SearchForm(
     modifier: Modifier = Modifier,
+    viewModel: BookSearchViewModel,
     loading: Boolean = false,
     hint: String = "Search",
     onSearch: (String) -> Unit = {}) {
@@ -141,17 +149,19 @@ fun SearchForm(
         }
 
         // 사용자 입력을 받는 컴포넌트
-        InputField(valuelState = searchQueryState, labelId = "Search", enabled = true,
-                onAction =  KeyboardActions {
-                    // 'valid'가 false이면 -> 콜백을 종료
-                    if (!valid) return@KeyboardActions
-                    // 'onSearch' 함수를 호출하여 검색을 수행
-                    onSearch(searchQueryState.value.trim())
+        InputField(valuelState = searchQueryState,
+            labelId = "Search",
+            enabled = true,
+            onAction =  KeyboardActions {
+                // 'valid'가 false이면 -> 콜백을 종료
+                if (!valid) return@KeyboardActions
+                // 'onSearch' 함수를 호출하여 검색을 수행
+                onSearch(searchQueryState.value.trim())
 
-                    // 검색 후 검색 쿼리를 초기화
-                    searchQueryState.value = ""
-                    // 검색 후 키보드를 숨김
-                    keyboardController?.hide()
-                })
+                // 검색 후 검색 쿼리를 초기화
+                searchQueryState.value = ""
+                // 검색 후 키보드를 숨김
+                keyboardController?.hide()
+            })
     }
 }
