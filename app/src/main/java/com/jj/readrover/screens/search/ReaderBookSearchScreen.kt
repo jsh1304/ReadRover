@@ -18,10 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -53,13 +51,12 @@ fun SearchScreen(
                 SearchForm( // 검색 폼 함수
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    viewModel) { query ->
+                        .padding(16.dp)) { query ->
                     viewModel.searchBooks(query)
                 }
 
                 Spacer(modifier = Modifier.height(13.dp))
-                BookList(navController) // 검색에 대한 책 리스트
+                BookList(navController, viewModel) // 검색에 대한 책 리스트
 
             }
         }
@@ -69,7 +66,14 @@ fun SearchScreen(
 
 // 검색에 대한 책 리스트
 @Composable
-fun BookList(navController: NavController) {
+fun BookList(navController: NavController, viewModel: BookSearchViewModel) {
+    if (viewModel.listOfBooks.value.loading == true) { // 책 정보 불러올 동안 = 로딩 시
+        Log.d("loading", "BookList: 로딩 중")
+        CircularProgressIndicator() // 원형 프로그레스 바 실행
+    } else { // 로딩 중이 아니라면
+        Log.d("loading", "BookList: ${viewModel.listOfBooks.value.data}")
+    }
+
 
     val listOfBooks = listOf(
         MBook(id = "aaa", title = "헬로 월드", authors = "누군가", notes = null),
@@ -129,7 +133,6 @@ fun BookRow(book: MBook,
 @Composable
 fun SearchForm(
     modifier: Modifier = Modifier,
-    viewModel: BookSearchViewModel,
     loading: Boolean = false,
     hint: String = "Search",
     onSearch: (String) -> Unit = {}) {
@@ -149,7 +152,7 @@ fun SearchForm(
         }
 
         // 사용자 입력을 받는 컴포넌트
-        InputField(valuelState = searchQueryState,
+        InputField(valueState = searchQueryState,
             labelId = "Search",
             enabled = true,
             onAction =  KeyboardActions {

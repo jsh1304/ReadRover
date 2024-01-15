@@ -59,7 +59,7 @@ fun EmailInput(
     onAction: KeyboardActions = KeyboardActions.Default // 키보드 액션을 처리하는 객체
 ) {
     InputField(modifier = modifier,
-        valuelState = emailState,
+        valueState = emailState,
         labelId = labelId,
         enabled = enabled,
         keyboardType = KeyboardType.Email,
@@ -70,7 +70,7 @@ fun EmailInput(
 @Composable
 fun InputField(
     modifier: Modifier = Modifier,
-    valuelState: MutableState<String>,
+    valueState: MutableState<String>,
     labelId: String,
     enabled: Boolean,
     isSingleLine: Boolean = true, // 입력 필드가 한 줄로 표시되는지 여부를 결정하는 값
@@ -79,8 +79,8 @@ fun InputField(
     onAction: KeyboardActions = KeyboardActions.Default
 ) {
     // 입력 필드를 구성하는 함수
-    OutlinedTextField(value = valuelState.value,
-        onValueChange = { valuelState.value = it},
+    OutlinedTextField(value = valueState.value,
+        onValueChange = { valueState.value = it},
         label = { Text(text = labelId)},
         singleLine = isSingleLine,
         textStyle = TextStyle(fontSize = 18.sp,
@@ -89,8 +89,8 @@ fun InputField(
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
         enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction))
-
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = onAction)
 
 }
 
