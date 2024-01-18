@@ -2,12 +2,14 @@ package com.jj.readrover.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jj.readrover.screens.ReaderSplashScreen
 import com.jj.readrover.screens.home.Home
 import com.jj.readrover.screens.login.ReaderLoginScreen
+import com.jj.readrover.screens.search.BookSearchViewModel
 import com.jj.readrover.screens.search.SearchScreen
 import com.jj.readrover.screens.stats.ReaderStatsScreen
 
@@ -34,7 +36,8 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.SearchScreen.name){ // 책 검색 화면 실행
-            SearchScreen(navController = navController)
+            val searchViewModel = hiltViewModel<BookSearchViewModel>()
+            SearchScreen(navController = navController, viewModel = searchViewModel)
         }
     }
 }
