@@ -70,13 +70,16 @@ fun SearchScreen(
 fun BookList(navController: NavController, viewModel: BookSearchViewModel) {
 
     val listOfBooks = viewModel.listOfBooks
-
-    // LazyColumn을 활용한 책 리스트
-    LazyColumn(modifier = Modifier.fillMaxWidth(),
+    if (viewModel.isLoading){
+        LinearProgressIndicator()
+    } else {
+        // LazyColumn을 활용한 책 리스트
+        LazyColumn(modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(16.dp)) { // 컨텐츠 주변에 패딩 16dp
-        // items 함수를 활용 -> 각 책 정보에 대한 행을 생성
-        items(items = listOfBooks) { book ->
-            BookRow(book, navController) // 책 정보 표시
+            // items 함수를 활용 -> 각 책 정보에 대한 행을 생성
+            items(items = listOfBooks) { book ->
+                BookRow(book, navController) // 책 정보 표시
+            }
         }
     }
 }
