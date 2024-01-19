@@ -115,10 +115,16 @@ fun BookRow(book: Item,
                 Column() {
                     // 책 제목 텍스트
                     Text(text = book.volumeInfo.title,
-                        overflow = TextOverflow.Ellipsis) // Elipsis: 텍스트가 넘치면 ...으로 표기하는 방식
+                        overflow = TextOverflow.Ellipsis, // Elipsis: 텍스트가 넘치면 ...으로 표기하는 방식
+                        maxLines = 3)
                     // 책 작가 텍스트
-                    Text(text = "작가: ${book.volumeInfo.authors}",
+                    Text(text = "저자: ${(book.volumeInfo.authors?.joinToString() ?:"정보 없음")}",
                         overflow = TextOverflow.Clip, // Clip: 텍스트가 넘치면 잘라내는 방식
+                        style = MaterialTheme.typography.caption)
+                    // 책 발행일, 카테고리 텍스트
+                    Text(text = "${book.volumeInfo.publishedDate} | " +
+                            (book.volumeInfo.categories?.joinToString() ?:"카테고리 정보 없음"),
+                        overflow = TextOverflow.Clip,
                         style = MaterialTheme.typography.caption)
                 }
             })
