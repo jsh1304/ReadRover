@@ -16,7 +16,7 @@ interface BooksApi {
     @GET("volumes")
     suspend fun getAllBooks(@Query("q") query: String): Book
 
-    @GET("volumes/{bookId")
+    @GET("volumes/{bookId}")
     suspend fun getBookInfo(@Path("bookId") bookId: String): Item
 
 }
