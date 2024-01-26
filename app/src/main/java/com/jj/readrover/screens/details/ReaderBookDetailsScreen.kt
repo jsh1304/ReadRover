@@ -23,9 +23,13 @@ import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jj.readrover.components.ReaderAppBar
+import com.jj.readrover.components.RoundedButton
 import com.jj.readrover.data.Resource
 import com.jj.readrover.model.Item
+import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
 @Composable
@@ -111,7 +115,8 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
 
     // 책소개 텍스트에 대한 Surface
     // Surface 높이를 디스플레이 해상도의 9%로 설정
-    Surface(modifier = Modifier.height(localDims.heightPixels.dp.times(0.09f))
+    Surface(modifier = Modifier
+        .height(localDims.heightPixels.dp.times(0.09f))
         .padding(4.dp),
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.DarkGray)) {
@@ -124,4 +129,56 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
         }
     }
 
+    Row(modifier = Modifier.padding(top = 6.dp),
+        horizontalArrangement = Arrangement.SpaceAround) {
+
+        // 클릭 시 MBook 객체를 생성
+        RoundedButton(label = "저장"){
+            val book = MBook(
+                title = bookData.title.toString(),
+                authors = bookData.authors.toString(),
+                description = bookData.description.toString(),
+                categories = bookData.categories.toString(),
+                notes = "",
+                photoUrl = bookData.imageLinks.thumbnail,
+                publishedDate = bookData.publishedDate,
+                pageCount = bookData.pageCount.toString(),
+                rating = 0.0,
+                googleBookId = googleBookId,
+                userId = FirebaseAuth.getInstance().currentUser?.uid.toString())
+            saveToFirebase(book, navController = navController)
+        }
+        Spacer(modifier = Modifier.width(25.dp))
+
+        // 취소 버튼 - 이전 화면으로 돌아가는 작업 수행
+        RoundedButton(label = "뒤로가기"){
+            navController.popBackStack()
+        }
+    }
+
+}
+
+// Firebase에 MBook 객체를 저장하는 함수
+fun saveToFirebase(book: MBook, navController: NavController) {
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("books")
+
+    // MBook 객체가 비어있지 않은 경우에만 Firebase에 저장
+    if (book.toString().isNotEmpty()) {
+        dbCollection.add(book)
+            .addOnSuccessListener { documentRef ->
+                val docId = documentRef.id
+                dbCollection.document(docId)
+                    .update(hashMapOf("id" to docId) as Map<String, Any>)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) { // 저장 성공 시 뒤로가기
+                            navController.popBackStack()
+                        }
+                    }.addOnFailureListener {
+                        Log.w("Error", "saveToFirebase: Error updating doc", it )
+                    }
+            }
+    } else {
+
+    }
 }
