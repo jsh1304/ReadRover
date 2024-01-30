@@ -1,32 +1,25 @@
 package com.jj.readrover.screens.home
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.Stars
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.jj.readrover.components.FABContent
 import com.jj.readrover.components.ListCard
@@ -37,7 +30,10 @@ import com.jj.readrover.navigation.ReaderScreens
 
 @Preview
 @Composable
-fun Home(navController: NavController = NavController(LocalContext.current)) {
+fun Home(
+    navController: NavController = NavController(LocalContext.current),
+    viewModel: HomeScreenViewModel = hiltViewModel()
+) {
     // Scaffold: 앱의 기본 레이아웃을 구성
     Scaffold(
         // TopBar: 앱의 상단 바를 설정
@@ -54,22 +50,32 @@ fun Home(navController: NavController = NavController(LocalContext.current)) {
 
         // 앱의 내용을 포함하는 표면을 설정
         Surface(modifier = Modifier.fillMaxSize()) {
-            HomeContent(navController)
+            HomeContent(navController, viewModel)
         }
     }
 }
 
 // 홈 콘텐츠를 보여주는 UI 컴포넌트
 @Composable
-fun HomeContent(navController: NavController) {
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = viewModel.data.value.data!!.toList().filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+        Log.d("Books", "HomeContent: ${listOfBooks.toString()}")
+    }
+
+/*
     val listOfBooks = listOf(
         MBook(id = "aaa", title = "헬로 월드", authors = "누군가", notes = null),
         MBook(id = "bbb", title = "굿바이 월드", authors = "누군가", notes = null),
         MBook(id = "ccc", title = "투모로우 월드", authors = "누군가", notes = null),
         MBook(id = "ddd", title = "하이 월드", authors = "누군가", notes = null),
         MBook(id = "eee", title = "리얼 월드", authors = "누군가", notes = null),
-    )
+    )*/
 
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserName = if (!email.isNullOrEmpty()) // 이메일 주소가 null이 아니고 비어있지 않다면

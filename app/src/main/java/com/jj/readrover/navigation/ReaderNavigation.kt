@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jj.readrover.screens.ReaderSplashScreen
 import com.jj.readrover.screens.details.BookDetailsScreen
 import com.jj.readrover.screens.home.Home
+import com.jj.readrover.screens.home.HomeScreenViewModel
 import com.jj.readrover.screens.login.ReaderLoginScreen
 import com.jj.readrover.screens.search.BookSearchViewModel
 import com.jj.readrover.screens.search.SearchScreen
@@ -35,7 +36,8 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.ReaderHomeScreen.name){ // 홈 화면 실행
-            Home(navController = navController)
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+            Home(navController = navController, viewModel = homeViewModel)
         }
 
         composable(ReaderScreens.SearchScreen.name){ // 책 검색 화면 실행
