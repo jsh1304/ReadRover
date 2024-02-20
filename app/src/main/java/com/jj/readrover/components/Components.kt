@@ -143,9 +143,8 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
 
 
 // 책 리스트 카드 생성 함수
-@Preview
 @Composable
-fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
+fun ListCard(book: MBook,
              onPressDetails: (String) -> Unit = {}) { // onPressDetails는 카드가 클릭되었을 때 호출되는 함수
     val context = LocalContext.current
 
@@ -177,7 +176,7 @@ fun ListCard(book: MBook = MBook("asd", "kotlin in action", "사람", "hi"),
             horizontalAlignment = Alignment.Start) {
             Row(horizontalArrangement = Arrangement.Center) {
                 // 책 이미지 생성
-                Image(painter = rememberImagePainter(data = "https://image.yes24.com/goods/55148593/XL"),
+                Image(painter = rememberImagePainter(data = book.photoUrl.toString()),
                     contentDescription = "book image",
                     modifier = Modifier
                         .height(140.dp)

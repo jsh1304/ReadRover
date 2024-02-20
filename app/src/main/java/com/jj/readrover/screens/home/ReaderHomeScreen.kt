@@ -108,7 +108,7 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
         }
 
         // 현재 읽는 책 보여주는 영역
-        ReadingRightNowArea(books = listOf(),
+        ReadingRightNowArea(listOfBooks = listOfBooks,
             navController = navController)
 
         // "독서 리스트" 제목 섹션
@@ -125,6 +125,7 @@ fun BookListArea(listOfBooks: List<MBook>,
                  navController: NavController) {
     HorizontalScrollableComponent(listOfBooks) {
         // TODO: 카드 클릭 시 책 세부사항으로 이동
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
@@ -146,11 +147,19 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (Stri
     }
 }
 
-// 현재 읽는 책 보여주는 영역
+// 현재 읽는 책 보여주고, 해당 책들을 가로 스크롤 가능한 컴포넌트에 표시
 @Composable
-fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
+fun ReadingRightNowArea(listOfBooks: List<MBook>,
+                        navController: NavController) {
+    //Filter books by reading now
+    val readingNowList = listOfBooks.filter { mBook ->
+        mBook.startedReading != null && mBook.finishedReading == null
+    }
 
-    ListCard() // 책 리스트 카드 불러오기
+    HorizontalScrollableComponent(readingNowList) {
+        Log.d("TAG", "BoolListArea: $it")
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
+    }
 }
 
 

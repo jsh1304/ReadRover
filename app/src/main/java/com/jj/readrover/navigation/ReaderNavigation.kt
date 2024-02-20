@@ -16,6 +16,7 @@ import com.jj.readrover.screens.login.ReaderLoginScreen
 import com.jj.readrover.screens.search.BookSearchViewModel
 import com.jj.readrover.screens.search.SearchScreen
 import com.jj.readrover.screens.stats.ReaderStatsScreen
+import com.jj.readrover.screens.update.BookUpdateScreen
 
 @ExperimentalComposeUiApi
 @Composable
@@ -57,6 +58,18 @@ fun ReaderNavigation() {
             backStackEntry.arguments?.getString("bookId").let {
                 BookDetailsScreen(navController = navController, bookId = it.toString())
             }
+        }
+
+        // 새로운 화면을 정의, 해당 화면으로 이동할 수 있는 경로를 설정
+        val updateName = ReaderScreens.UpdateScreen.name
+        composable("$updateName/{bookItemId}",
+                    arguments = listOf(navArgument("bookItemId") {
+                        type = NavType.StringType
+                    })) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString("bookItemId").let {
+                BookUpdateScreen(navController = navController, bookItemId = it.toString())
+            }
+
         }
     }
 }
