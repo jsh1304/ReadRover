@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -102,11 +103,54 @@ fun ShowSimepleForm(book: MBook, navController: NavHostController) {
         mutableStateOf("")
     }
 
+    // 독서 시작 및 완료 상태를 저장하는 상태 변수
+    val isStartedReading = remember {
+        mutableStateOf(false)
+    }
+    val isFinishedReading = remember {
+        mutableStateOf(false)
+    }
+
     // SimpleForm을 호출하여 사용자 입력을 받음
     SimpleForm(defaultValue = if (book.notes.toString().isNotEmpty()) book.notes.toString()
             else "책에 대한 의견이 없습니다."){ note ->
         notesText.value = note
     }
+
+    // 독서 시작 및 완료 버튼 행
+    Row(modifier = Modifier.padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start) {
+        // 독서 시작 버튼
+        TextButton(onClick = { isStartedReading.value = true },
+                enabled = book.startedReading == null) {
+            if (book.startedReading == null) {
+                if (!isStartedReading.value) {
+                    Text(text = "독서 시작")
+                } else {
+                    Text(text = "독서 진행중",
+                        modifier = Modifier.alpha(0.6f),
+                        color = Color.Red.copy(alpha = 0.5f))
+                }
+            } else{
+                Text(text = "독서 시작 날짜: ${book.startedReading}")
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        // 독서 완료 버튼
+        TextButton(onClick = { isFinishedReading.value = true },
+                enabled = book.finishedReading == null) {
+            if (book.finishedReading == null) {
+                if (!isFinishedReading.value) {
+                    Text(text = "읽음 표시")
+                } else {
+                    Text(text = "독서 완료")
+                }
+            } else {
+                Text(text = "독서 완료 날짜: ${book.finishedReading}")
+            }
+        }
+    }  
 }
 
 @ExperimentalComposeUiApi
