@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.jj.readrover.components.InputField
+import com.jj.readrover.components.RatingBar
 import com.jj.readrover.components.ReaderAppBar
 import com.jj.readrover.data.DataOrException
 import com.jj.readrover.model.MBook
@@ -84,7 +85,7 @@ fun BookUpdateScreen(
                         ShowBookUpdate(bookInfo = viewModel.data.value, bookItemId = bookItemId)
                     }
                     // 해당 아이템 ID에 해당하는 책을 찾아서 간단한 폼을 표시하는 컴포넌트 호출
-                    ShowSimepleForm(book = viewModel.data.value.data?.first { mBook ->
+                    ShowSimpleForm(book = viewModel.data.value.data?.first { mBook ->
                         mBook.googleBookId == bookItemId
                     }!!, navController)
                 }
@@ -96,7 +97,7 @@ fun BookUpdateScreen(
 
 @ExperimentalComposeUiApi
 @Composable
-fun ShowSimepleForm(book: MBook, navController: NavHostController) {
+fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
     // 사용자의 노트 텍스트를 저장하기 위한 상태 변수
     val notesText = remember {
@@ -109,6 +110,11 @@ fun ShowSimepleForm(book: MBook, navController: NavHostController) {
     }
     val isFinishedReading = remember {
         mutableStateOf(false)
+    }
+
+    // 책 평가 점수 저장하는 상태 변수
+    val ratingVal = remember {
+        mutableStateOf(0)
     }
 
     // SimpleForm을 호출하여 사용자 입력을 받음
@@ -150,7 +156,16 @@ fun ShowSimepleForm(book: MBook, navController: NavHostController) {
                 Text(text = "독서 완료 날짜: ${book.finishedReading}")
             }
         }
-    }  
+    }
+    // "평가" 텍스트를 표시하고 아래에 평점을 표시하는 부분
+    Text(text = "평가", modifier = Modifier.padding(bottom = 3.dp))
+
+    // 책의 평점을 가져와서 RatingBar로 표시
+    book.rating?.toInt()?.let { // 책의 평점이 null이 아닌 경우
+        RatingBar(rating = it) { rating -> // RatingBar 컴포저블 호출
+            ratingVal.value = rating // 선택된 평점을 ratingVal에 저장
+        }
+    }
 }
 
 @ExperimentalComposeUiApi

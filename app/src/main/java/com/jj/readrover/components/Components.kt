@@ -1,6 +1,11 @@
 package com.jj.readrover.components
 
 import android.graphics.drawable.Icon
+import android.view.MotionEvent
+import android.widget.RatingBar
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,15 +16,17 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.jj.readrover.R
 import com.jj.readrover.model.MBook
 import com.jj.readrover.navigation.ReaderScreens
 
@@ -341,6 +349,62 @@ fun BookRating(score: Double = 4.5) {
 
             // 책 평가 점수 아이콘
             Text(text = score.toString(), style = MaterialTheme.typography.subtitle1)
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier, // Modifier를 설정할 수 있는 매개변수
+    rating: Int, // 현재 평점
+    onPressRating: (Int) -> Unit // 평점을 눌렀을 때 호출되는 콜백 함수
+) {
+    // 현재 평점을 저장하는 상태 변수
+    var ratingState by remember {
+        mutableStateOf(rating)
+    }
+
+    // 평점을 선택한 상태를 저장하는 상태 변수
+    var selected by remember {
+        mutableStateOf(false)
+    }
+
+    // 아이콘의 크기를 바운스 애니메이션과 함께 변경하는 상태 변수
+    val size by animateDpAsState(
+        targetValue = if (selected) 42.dp else 34.dp,
+        spring(Spring.DampingRatioMediumBouncy) // 바운스 애니메이션 적용
+    )
+
+    // 평점을 표시하는 가로 방향의 Row
+    Row(
+        modifier = Modifier.width(280.dp), // 가로 폭 설정
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        // 1부터 5까지의 평점 아이콘을 반복하여 표시
+        for (i in 1..5) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_star_24), // 별 아이콘
+                contentDescription = "star",
+                modifier = modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter { // 터치 이벤트 처리
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> { // 터치 다운 이벤트
+                                selected = true // 선택된 상태로 변경
+                                onPressRating(i) // 선택된 평점을 콜백 함수에 전달
+                                ratingState = i // 상태 변수에 현재 평점 저장
+                            }
+                            MotionEvent.ACTION_UP -> { // 터치 업 이벤트
+                                selected = false // 선택 해제
+                            }
+                        }
+                        true
+                    },
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1) // 평점에 따른 아이콘 색상 설정
+            )
         }
     }
 }
