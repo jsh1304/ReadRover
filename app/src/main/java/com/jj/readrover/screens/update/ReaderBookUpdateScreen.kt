@@ -29,9 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jj.readrover.components.InputField
 import com.jj.readrover.components.RatingBar
 import com.jj.readrover.components.ReaderAppBar
+import com.jj.readrover.components.RoundedButton
 import com.jj.readrover.data.DataOrException
 import com.jj.readrover.model.MBook
 import com.jj.readrover.screens.home.HomeScreenViewModel
@@ -101,7 +104,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
     // 사용자의 노트 텍스트를 저장하기 위한 상태 변수
     val notesText = remember {
-        mutableStateOf("")
+        mutableStateOf(book.notes ?: "")
     }
 
     // 독서 시작 및 완료 상태를 저장하는 상태 변수
@@ -166,6 +169,51 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
             ratingVal.value = rating // 선택된 평점을 ratingVal에 저장
         }
     }
+// 하단 여백 추가
+    Spacer(modifier = Modifier.padding(bottom = 15.dp))
+
+// 책 정보 업데이트를 위한 로우
+    Row {
+        // 책의 노트, 평점이 변경되었는지 확인
+        val changedNotes = book.notes != notesText.value
+        val changedRating = book.rating?.toInt() != ratingVal.value
+        // 독서 시작 및 완료 타임스탬프 설정
+        val isFinishedTimeStamp = if(isFinishedReading.value) Timestamp.now() else book.finishedReading
+        val isStartedTimestamp = if (isStartedReading.value) Timestamp.now() else book.startedReading
+
+        // 책 정보가 업데이트되었는지 여부를 확인
+        val bookUpdate = changedNotes || changedRating || isFinishedReading.value || isStartedReading.value
+
+        // 업데이트할 책 정보 맵 생성
+        val bookToUpdate = hashMapOf(
+            "finished_reading_at" to isFinishedTimeStamp,
+            "started_reading_at" to isStartedTimestamp,
+            "rating" to ratingVal.value,
+            "notes" to notesText.value
+        ).toMap()
+
+        // 수정 버튼
+        RoundedButton(label = "수정") {
+            if (bookUpdate) { // 책 정보가 변경되었을 경우
+                FirebaseFirestore.getInstance() // Firestore 인스턴스 가져오기
+                    .collection("books") // "books" 컬렉션 참조
+                    .document(book.id!!) // 해당 책 문서 참조
+                    .update(bookToUpdate) // 업데이트할 정보로 업데이트 수행
+                    .addOnCompleteListener { task ->
+                        Log.d("TAG", "ShowSimpleForm: ${task.result.toString()}") // 업데이트 성공 로그
+                    }.addOnFailureListener { // 실패 리스너
+                        Log.w("Error", "document 업데이트 에러", it) // 에러 로그
+                    }
+            }
+        }
+        // 수정 버튼과 간격을 주기 위한 여백
+        Spacer(modifier = Modifier.width(100.dp))
+        // 삭제 버튼
+        RoundedButton(label = "삭제") {
+            // 삭제 기능을 구현할 코드 추가
+        }
+    }
+
 }
 
 @ExperimentalComposeUiApi
@@ -185,7 +233,8 @@ fun SimpleForm(
 
     // 입력 필드를 구성
     InputField(
-        modifier = Modifier
+        modifier
+            .fillMaxWidth()
             .height(140.dp)
             .padding(3.dp)
             .background(Color.White, CircleShape)
