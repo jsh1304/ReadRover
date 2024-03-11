@@ -1,6 +1,8 @@
 package com.jj.readrover.screens.update
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,7 +40,9 @@ import com.jj.readrover.components.ReaderAppBar
 import com.jj.readrover.components.RoundedButton
 import com.jj.readrover.data.DataOrException
 import com.jj.readrover.model.MBook
+import com.jj.readrover.navigation.ReaderScreens
 import com.jj.readrover.screens.home.HomeScreenViewModel
+import com.jj.readrover.utils.formatDate
 
 // 책 업데이트 화면 정의
 @ExperimentalComposeUiApi
@@ -102,6 +107,8 @@ fun BookUpdateScreen(
 @Composable
 fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
+    val context = LocalContext.current
+
     // 사용자의 노트 텍스트를 저장하기 위한 상태 변수
     val notesText = remember {
         mutableStateOf(book.notes ?: "")
@@ -142,7 +149,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                         color = Color.Red.copy(alpha = 0.5f))
                 }
             } else{
-                Text(text = "독서 시작 날짜: ${book.startedReading}")
+                Text(text = "독서 시작: ${formatDate(book.startedReading!!)}")
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -156,7 +163,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                     Text(text = "독서 완료")
                 }
             } else {
-                Text(text = "독서 완료 날짜: ${book.finishedReading}")
+                Text(text = "독서 완료: ${formatDate(book.finishedReading!!)}")
             }
         }
     }
@@ -200,7 +207,9 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                     .document(book.id!!) // 해당 책 문서 참조
                     .update(bookToUpdate) // 업데이트할 정보로 업데이트 수행
                     .addOnCompleteListener { task ->
-                        Log.d("TAG", "ShowSimpleForm: ${task.result.toString()}") // 업데이트 성공 로그
+                        showToast(context, "책 업데이트 완료")
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                        //Log.d("TAG", "ShowSimpleForm: ${task.result.toString()}") // 업데이트 성공 로그
                     }.addOnFailureListener { // 실패 리스너
                         Log.w("Error", "document 업데이트 에러", it) // 에러 로그
                     }
@@ -214,6 +223,11 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
         }
     }
 
+}
+
+fun showToast(context: Context, msg: String) {
+    Toast.makeText(context, msg, Toast.LENGTH_LONG)
+        .show()
 }
 
 @ExperimentalComposeUiApi
