@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">ReadRover</string>
+    <string name="sure"> 정말로 이 책을 삭제하시겠습니까?</string>
+    <string name="action"> 이후에 복구될 수 없습니다.</string>
     <string name="create_acct"> 유효한 이메일과 최소 6글자 이상의 비밀번호를 입력해주세요. </string>
 </resources>

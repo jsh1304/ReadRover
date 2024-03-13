@@ -13,10 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -26,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,6 +32,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jj.readrover.R
 import com.jj.readrover.components.InputField
 import com.jj.readrover.components.RatingBar
 import com.jj.readrover.components.ReaderAppBar
@@ -217,12 +216,70 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
         }
         // 수정 버튼과 간격을 주기 위한 여백
         Spacer(modifier = Modifier.width(100.dp))
-        // 삭제 버튼
+        // 다이얼로그를 열거나 닫기 위한 상태 변수 생성
+        val openDialog = remember {
+            mutableStateOf(false)
+        }
+
+        // 다이얼로그가 열려 있는 경우에만 ShowAlertDialog를 호출하여 다이얼로그 표시
+        if (openDialog.value) {
+            ShowAlertDialog(
+                message = stringResource(id = R.string.sure) + "\n" +
+                        stringResource(id = R.string.action), // 다이얼로그에 표시할 메시지
+                openDialog = openDialog, // 다이얼로그 열기/닫기 상태
+            ) {
+                // "Yes" 버튼을 눌렀을 때 실행할 코드
+                FirebaseFirestore.getInstance() // Firestore 인스턴스 가져오기
+                    .collection("books") // "books" 컬렉션 참조
+                    .document(book.id!!) // 해당 책 문서 참조
+                    .delete() // 문서 삭제
+                    .addOnCompleteListener { // 작업 완료 리스너
+                        if (it.isSuccessful) { // 작업이 성공한 경우
+                            openDialog.value = false // 다이얼로그 닫기
+                            navController.navigate(ReaderScreens.ReaderHomeScreen.name) // 홈 화면으로 이동
+                        }
+                    }
+            }
+        }
+
+        // "삭제" 버튼
         RoundedButton(label = "삭제") {
-            // 삭제 기능을 구현할 코드 추가
+            // 삭제 버튼을 눌렀을 때 다이얼로그 열기
+            openDialog.value = true
         }
     }
 
+}
+
+@Composable
+fun ShowAlertDialog(
+    message: String, // 다이얼로그에 표시할 메시지
+    openDialog: MutableState<Boolean>, // 다이얼로그를 열거나 닫기 위한 상태
+    onYesPressed: () -> Unit // "Yes" 버튼을 눌렀을 때 호출할 콜백 함수
+) {
+    if (openDialog.value) { // 다이얼로그가 열려 있는지 확인
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false }, // 다이얼로그 닫기 요청 시 상태 변경
+            title = { Text(text = "책 삭제") }, // 다이얼로그 제목
+            text = { Text(text = message) }, // 다이얼로그 메시지
+            buttons = {
+                // 버튼 레이아웃
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // "Yes" 버튼
+                    TextButton(onClick = { onYesPressed.invoke() }) {
+                        Text(text = "네") // 버튼 텍스트
+                    }
+                    // "No" 버튼
+                    TextButton(onClick = { openDialog.value = false }) {
+                        Text(text = "아니오") // 버튼 텍스트
+                    }
+                }
+            }
+        )
+    }
 }
 
 fun showToast(context: Context, msg: String) {
