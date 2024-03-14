@@ -215,9 +215,24 @@ fun ListCard(book: MBook,
                 style = MaterialTheme.typography.caption)
         }
 
-        Row(horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom) {
-            RoundedButton(label = "독서하기", radius = 70) // 독서 하기 버튼 구현
+        // 독서 시작 여부를 저장하는 상태 변수 생성
+        val isStartedReading = remember {
+            mutableStateOf(false)
+        }
+
+        // 독서 시작 여부를 판별하고 상태 변수에 저장
+        isStartedReading.value = book.startedReading != null
+
+        // 가로 정렬을 오른쪽으로, 세로 정렬을 아래쪽으로 설정한 로우
+        Row(
+            horizontalArrangement = Arrangement.End, // 가로 정렬을 오른쪽으로 설정
+            verticalAlignment = Alignment.Bottom // 세로 정렬을 아래쪽으로 설정
+        ) {
+            // 독서 시작 여부에 따라 버튼 레이블을 결정하는 둥근 버튼 표시
+            RoundedButton(
+                label = if (isStartedReading.value) "독서 중" else "독서 전", // 버튼 레이블 설정
+                radius = 70 // 버튼의 반지름 설정
+            ) // 독서 하기 버튼 구현
         }
     }
 

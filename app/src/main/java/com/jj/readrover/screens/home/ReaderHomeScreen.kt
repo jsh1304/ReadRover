@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -123,25 +125,56 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>,
                  navController: NavController) {
-    HorizontalScrollableComponent(listOfBooks) {
+    val addedBooks = listOfBooks.filter { mBook ->
+        mBook.startedReading == null && mBook.finishedReading == null
+    }
+    HorizontalScrollableComponent(addedBooks) {
         // TODO: 카드 클릭 시 책 세부사항으로 이동
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
-// 수평 스크롤 가능 컴포넌트
+// 수평 스크롤 가능한 컴포넌트를 정의하는 함수
 @Composable
-fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (String) -> Unit) {
-    val scrollState = rememberScrollState() // 스크롤 가능한 컴포넌트, 스크롤 위치를 기억
+fun HorizontalScrollableComponent(
+    listOfBooks: List<MBook>, // 책 목록
+    viewModel: HomeScreenViewModel = hiltViewModel(), // 뷰 모델
+    onCardPressed: (String) -> Unit // 카드가 눌렸을 때 호출할 콜백 함수
+) {
+    val scrollState = rememberScrollState() // 스크롤 상태를 기억하는 스테이트
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(280.dp)
-        .horizontalScroll(scrollState)) {
-
-        for (book in listOfBooks) {
-            ListCard(book) {
-                onCardPressed(book.googleBookId.toString())
+    // 가로로 스크롤 가능한 Row 컴포넌트
+    Row(
+        modifier = Modifier
+            .fillMaxWidth() // 최대 가로 길이까지 채움
+            .heightIn(280.dp) // 높이를 최대 280dp로 제한
+            .horizontalScroll(scrollState) // 수평 스크롤 적용
+    ) {
+        // 데이터 로딩 중인 경우
+        if (viewModel.data.value.loading == true) {
+            LinearProgressIndicator() // 로딩 인디케이터 표시
+        } else {
+            // 책 목록이 비어 있는 경우
+            if (listOfBooks.isNullOrEmpty()) {
+                Surface(modifier = Modifier.padding(23.dp)) {
+                    // 책을 추가해달라는 안내 메시지 표시
+                    Text(
+                        text = "책을 추가해주세요.",
+                        style = TextStyle(
+                            color = Color.Red.copy(alpha = 0.4f),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    )
+                }
+            } else {
+                // 책 목록을 순회하며 각각의 책 카드를 표시
+                for (book in listOfBooks) {
+                    // ListCard 컴포넌트를 호출하여 책 카드 표시
+                    ListCard(book) {
+                        onCardPressed(book.googleBookId.toString())
+                    }
+                }
             }
         }
     }
