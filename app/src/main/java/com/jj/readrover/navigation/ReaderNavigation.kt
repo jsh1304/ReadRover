@@ -33,7 +33,8 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.ReaderStatsScreen.name){ // 사용자 독서 통계 화면 실행
-            ReaderStatsScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+            ReaderStatsScreen(navController = navController, viewModel = homeViewModel)
         }
 
         composable(ReaderScreens.ReaderHomeScreen.name){ // 홈 화면 실행
